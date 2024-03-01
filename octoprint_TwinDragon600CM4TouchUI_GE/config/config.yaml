@@ -1,0 +1,87 @@
+accessControl:
+  salt: fUFvr6Z53jUp6yN4FwNzG2ChKvWSXI6m
+api:
+  allowCrossOrigin: true
+  key: B508534ED20348F090B4D0AD637D3660
+feature:
+  modelSizeDetection: false
+plugins:
+  Julia2018PrintRestore:
+    _config_version: 2
+  announcements:
+    _config_version: 1
+    channels:
+      _blog:
+        read_until: 1702886400
+      _important:
+        read_until: 1698310200
+      _octopi:
+        read_until: 1684929600
+      _plugins:
+        read_until: 1705881600
+      _releases:
+        read_until: 1696862700
+  discovery:
+    upnpUuid: c86719af-3109-4af6-bdd6-17da5e7041b5
+  errortracking:
+    unique_id: 91c6fa42-eae0-4e0b-8fc6-d7ea1c81cdc6
+  firmwareupdater:
+    _config_version: 3
+    _selected_profile: 0
+    profiles:
+    - _id: 0
+      _name: Default
+  gcodeviewer:
+    _config_version: 1
+  klipper:
+    _config_version: 4
+    configuration:
+      confirm_reload: false
+    connection:
+      replace_connection_panel: false
+  softwareupdate:
+    _config_version: 9
+  tracking:
+    enabled: true
+    unique_id: 70915093-216a-4992-8eb3-a40d9d178c27
+  virtual_printer:
+    _config_version: 1
+printerProfiles:
+  default: _default
+serial:
+  additionalPorts:
+  - /tmp/printer
+  autoconnect: true
+  baudrate: 115200
+  disconnectOnErrors: false
+  ignoreErrorsFromFirmware: true
+  port: /tmp/printer
+server:
+  commands:
+    serverRestartCommand: sudo reboot now
+    systemRestartCommand: sudo service octoprint restart
+    systemShutdownCommand: sudo shutdown
+  firstRun: false
+  onlineCheck:
+    enabled: true
+  pluginBlacklist:
+    enabled: true
+  secretKey: 8ed0Bqec8dNsQC2PRoqhCF0G4lPhdXS8
+  seenWizards:
+    backup: null
+    corewizard: 4
+    tracking: null
+temperature:
+  profiles:
+  - bed: 100
+    chamber: null
+    extruder: 210
+    name: ABS
+  - bed: 60
+    chamber: null
+    extruder: 180
+    name: PLA
+webcam:
+  ffmpeg: /usr/bin/ffmpeg
+  snapshot: http://127.0.0.1:8080/?action=snapshot
+  stream: /webcam/?action=stream
