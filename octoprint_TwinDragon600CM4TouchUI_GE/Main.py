@@ -1487,8 +1487,10 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
         octopiclient.gcode("G1 E300 F2000")
         octopiclient.gcode("G1 E300 F2000")
         octopiclient.gcode("G1 E300 F2000")
-        #octopiclient.gcode("G1 E500 F1000")
-        #octopiclient.gcode("G1 E300 F1000")
+        octopiclient.gcode("G1 E300 F2000")
+        octopiclient.gcode("G1 E200 F1000")
+        octopiclient.gcode("G1 E100 F1000")
+        octopiclient.gcode("G1 E30 F1000")
         octopiclient.gcode("G90")
         while self.stackedWidget.currentWidget() == self.changeFilamentExtrudePage:
             octopiclient.gcode("G91")
@@ -1510,7 +1512,10 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
         octopiclient.gcode("G1 E-300 F2000")
         octopiclient.gcode("G1 E-300 F2000")
         octopiclient.gcode("G1 E-400 F2000")
-        octopiclient.gcode("G1 E-400 F2000")
+        octopiclient.gcode("G1 E-100 F2000")
+        octopiclient.gcode("G0 E-100 F2000")
+        octopiclient.gcode("G1 E-100 F2000")
+        octopiclient.gcode("G1 E-100 F2000")
 											
         octopiclient.gcode("G90")
         while self.stackedWidget.currentWidget() == self.changeFilamentRetractPage:
@@ -1935,14 +1940,14 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
             time.sleep(1)
             if self.printerStatusText not in ["Printing","Paused"]:
                 octopiclient.gcode("G90")
-                octopiclient.gcode("G1 X-30 Y-80 F10000")
+                octopiclient.gcode("G1 X655 Y-80 F10000")
         else:
             self.setActiveExtruder(0)
             octopiclient.selectTool(0)
             time.sleep(1)
             if self.printerStatusText not in ["Printing","Paused"]:
                 octopiclient.gcode("G90")
-                octopiclient.gcode("G1 X655 Y-80 F10000")
+                octopiclient.gcode("G1 X-30 Y-80 F10000")
 
     def selectToolMotion(self):
         '''
