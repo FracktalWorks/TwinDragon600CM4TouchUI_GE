@@ -1934,12 +1934,14 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
             octopiclient.selectTool(1)
             time.sleep(1)
             if self.printerStatusText not in ["Printing","Paused"]:
+                octopiclient.gcode("G90")
                 octopiclient.gcode("G1 X-30 Y-80 F10000")
         else:
             self.setActiveExtruder(0)
             octopiclient.selectTool(0)
             time.sleep(1)
             if self.printerStatusText not in ["Printing","Paused"]:
+                octopiclient.gcode("G90")
                 octopiclient.gcode("G1 X655 Y-80 F10000")
 
     def selectToolMotion(self):
