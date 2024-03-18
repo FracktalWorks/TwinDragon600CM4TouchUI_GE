@@ -636,12 +636,12 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
         self.fileSelectedUSBPrintButton.pressed.connect(lambda: self.transferToLocal(prnt=True))
 
         # ControlScreen
-        self.moveYPButton.pressed.connect(lambda: octopiclient.jog(y=self.step, speed=1000))
-        self.moveYMButton.pressed.connect(lambda: octopiclient.jog(y=-self.step, speed=1000))
-        self.moveXMButton.pressed.connect(lambda: octopiclient.jog(x=-self.step, speed=1000))
-        self.moveXPButton.pressed.connect(lambda: octopiclient.jog(x=self.step, speed=1000))
-        self.moveZPButton.pressed.connect(lambda: octopiclient.jog(z=self.step, speed=1000))
-        self.moveZMButton.pressed.connect(lambda: octopiclient.jog(z=-self.step, speed=1000))
+        self.moveYPButton.pressed.connect(lambda: octopiclient.jog(y=self.step, speed=2000))
+        self.moveYMButton.pressed.connect(lambda: octopiclient.jog(y=-self.step, speed=2000))
+        self.moveXMButton.pressed.connect(lambda: octopiclient.jog(x=-self.step, speed=2000))
+        self.moveXPButton.pressed.connect(lambda: octopiclient.jog(x=self.step, speed=2000))
+        self.moveZPButton.pressed.connect(lambda: octopiclient.jog(z=self.step, speed=2000))
+        self.moveZMButton.pressed.connect(lambda: octopiclient.jog(z=-self.step, speed=2000))
         self.extruderButton.pressed.connect(lambda: octopiclient.extrude(self.step))
         self.retractButton.pressed.connect(lambda: octopiclient.extrude(-self.step))
         self.motorOffButton.pressed.connect(lambda: octopiclient.gcode(command='M18'))
@@ -1435,9 +1435,25 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
     #
 
     ''' +++++++++++++++++++++++++++++++++Change Filament+++++++++++++++++++++++++++++++ '''
+    def calcExtrudeTime(self, length, speed):
+        '''
+        Calculate the time it takes to extrude a certain length of filament at a certain speed
+        :param length: length of filament to extrude
+        :param speed: speed at which to extrude
+        :return: time in seconds
+        '''
+        return length / (speed/60)
 
     def unloadFilament(self):
         #Update
+        if self.printerStatusText not in ["Printing","Paused"]:
+            if self.activeExtruder == 1:
+                octopiclient.gcode("G90")
+                octopiclient.gcode("G1 X655 Y-79 F10000")
+            else:
+                octopiclient.gcode("G90")
+                octopiclient.gcode("G1 X-30 Y-79 F10000")
+                
         if self.changeFilamentComboBox.findText("Loaded Filament") == -1:
             octopiclient.setToolTemperature({"tool1": filaments[str(
                 self.changeFilamentComboBox.currentText())]}) if self.activeExtruder == 1 else octopiclient.setToolTemperature(
@@ -1451,6 +1467,14 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
 
     def loadFilament(self):
         #Update
+        if self.printerStatusText not in ["Printing","Paused"]:
+            if self.activeExtruder == 1:
+                octopiclient.gcode("G90")
+                octopiclient.gcode("G1 X655 Y-79 F10000")
+            else:
+                octopiclient.gcode("G90")
+                octopiclient.gcode("G1 X-30 Y-79 F10000")
+
         if self.changeFilamentComboBox.findText("Loaded Filament") == -1:
             octopiclient.setToolTemperature({"tool1": filaments[str(
                 self.changeFilamentComboBox.currentText())]}) if self.activeExtruder == 1 else octopiclient.setToolTemperature(
@@ -1471,7 +1495,7 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
         self.stackedWidget.setCurrentWidget(self.changeFilamentLoadPage)
         while self.stackedWidget.currentWidget() == self.changeFilamentLoadPage:
             octopiclient.gcode("G91")
-            octopiclient.gcode("G1 E15 F1500")
+            octopiclient.gcode("G1 E15 F1000")
             octopiclient.gcode("G90")
             time.sleep(1)
 
@@ -1481,22 +1505,19 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
         once filament is loaded, this function is called to extrude filament till the toolhead
         '''
         self.stackedWidget.setCurrentWidget(self.changeFilamentExtrudePage)
-        octopiclient.gcode("G91")
-        octopiclient.gcode("G1 E300 F2000")
-        octopiclient.gcode("G1 E300 F2000")
-        octopiclient.gcode("G1 E300 F2000")
-        octopiclient.gcode("G1 E300 F2000")
-        octopiclient.gcode("G1 E300 F2000")
-        octopiclient.gcode("G1 E300 F2000")
-        octopiclient.gcode("G1 E200 F1000")
-        octopiclient.gcode("G1 E100 F1000")
-        octopiclient.gcode("G1 E30 F1000")
-        octopiclient.gcode("G90")
+        for i in range(6):
+										   
+										   
+            octopiclient.gcode("G91")
+            octopiclient.gcode("G1 E300 F1500")
+            octopiclient.gcode("G90")
+            time.sleep(self.calcExtrudeTime(300, 1500))
+
         while self.stackedWidget.currentWidget() == self.changeFilamentExtrudePage:
             octopiclient.gcode("G91")
-            octopiclient.gcode("G1 E5 F400")
+            octopiclient.gcode("G1 E20 F600")
             octopiclient.gcode("G90")
-            time.sleep(3)
+            time.sleep(self.calcExtrudeTime(20, 600))
     @run_async
     def changeFilamentRetractFunction(self):
         '''
@@ -1505,30 +1526,40 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
         self.stackedWidget.setCurrentWidget(self.changeFilamentRetractPage)
         octopiclient.gcode("G91")
         octopiclient.gcode("G1 E20 F1000")
+        time.sleep(self.calcExtrudeTime(20, 1000))
         octopiclient.gcode("G1 E-20 F1000")
+        time.sleep(self.calcExtrudeTime(20, 1000))
         octopiclient.gcode("G1 E-150 F500")
-        octopiclient.gcode("G1 E-300 F2000")
-        octopiclient.gcode("G1 E-300 F2000")
-        octopiclient.gcode("G1 E-300 F2000")
-        octopiclient.gcode("G1 E-300 F2000")
-        octopiclient.gcode("G1 E-400 F2000")
-        octopiclient.gcode("G1 E-100 F2000")
-        octopiclient.gcode("G0 E-100 F2000")
-        octopiclient.gcode("G1 E-100 F2000")
-        octopiclient.gcode("G1 E-100 F2000")
+        time.sleep(self.calcExtrudeTime(150, 500))
+        # octopiclient.gcode("G1 E-300 F2000")
+        # octopiclient.gcode("G1 E-300 F2000")
+        # octopiclient.gcode("G1 E-300 F2000")
+        # octopiclient.gcode("G1 E-300 F2000")
+        # octopiclient.gcode("G1 E-400 F2000")
+        # octopiclient.gcode("G1 E-100 F2000")
+        # octopiclient.gcode("G0 E-100 F2000")
+        # octopiclient.gcode("G1 E-100 F2000")
+        # octopiclient.gcode("G1 E-100 F2000")
 											
         octopiclient.gcode("G90")
+
+        for i in range(5):
+            octopiclient.gcode("G91")
+            octopiclient.gcode("G1 E-300 F1500")
+            octopiclient.gcode("G90")
+            time.sleep(self.calcExtrudeTime(300, 1500))
+
         while self.stackedWidget.currentWidget() == self.changeFilamentRetractPage:
             octopiclient.gcode("G91")
-            octopiclient.gcode("G1 E-20 F2000")
+            octopiclient.gcode("G1 E-5 F1000")
             octopiclient.gcode("G90")
-            time.sleep(3)
+            time.sleep(self.calcExtrudeTime(5, 1000))
 
     def changeFilament(self):
         time.sleep(1)
         if self.printerStatusText not in ["Printing","Paused"]:
             octopiclient.gcode("G28")
-            octopiclient.gcode("G1 X-30 Y-80 F7000")
+            #octopiclient.gcode("G1 X-30 Y-80 F7000")
 
         self.stackedWidget.setCurrentWidget(self.changeFilamentPage)
         self.changeFilamentComboBox.clear()
@@ -1938,16 +1969,16 @@ class MainUiClass(QtWidgets.QMainWindow, mainGUI.Ui_MainWindow):
             self.setActiveExtruder(1)
             octopiclient.selectTool(1)
             time.sleep(1)
-            if self.printerStatusText not in ["Printing","Paused"]:
-                octopiclient.gcode("G90")
-                octopiclient.gcode("G1 X655 Y-80 F10000")
+            # if self.printerStatusText not in ["Printing","Paused"]:
+            #     octopiclient.gcode("G90")
+            #     octopiclient.gcode("G1 X655 Y-80 F10000")
         else:
             self.setActiveExtruder(0)
             octopiclient.selectTool(0)
             time.sleep(1)
-            if self.printerStatusText not in ["Printing","Paused"]:
-                octopiclient.gcode("G90")
-                octopiclient.gcode("G1 X-30 Y-80 F10000")
+            # if self.printerStatusText not in ["Printing","Paused"]:
+            #     octopiclient.gcode("G90")
+            #     octopiclient.gcode("G1 X-30 Y-80 F10000")
 
     def selectToolMotion(self):
         '''
